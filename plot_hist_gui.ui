@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>696</width>
+    <height>406</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
+    <item>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="incoming_connections_checkbox">
+        <property name="text">
+         <string>Incoming</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="filter_num_partner_nodes_label">
+        <property name="text">
+         <string> Filter num of partner nodes:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="filter_num_partner_nodes_textbox"/>
+      </item>
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="outgoing_connections_checkbox">
+        <property name="text">
+         <string>Outgoing</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="3">
+       <widget class="QPushButton" name="fetch_skiddata_button">
+        <property name="text">
+         <string>Submit</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="connections_label">
+        <property name="text">
+         <string>Connections:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="enter_skid_textbox"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="skeleton_id_label">
+        <property name="text">
+         <string>Enter skeleton id:</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item>
+       <widget class="QLabel" name="neuron_type1_label">
+        <property name="text">
+         <string>Neuron type 1: </string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="neuron_type1_box">
+        <property name="editable">
+         <bool>false</bool>
+        </property>
+        <item>
+         <property name="text">
+          <string/>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>P-EN1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>P-EN2</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>P-EG</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>E-PG</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>G-E</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Bidirectional Ring</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_8">
+      <item>
+       <widget class="QLabel" name="pb_glom_label">
+        <property name="text">
+         <string>PB Glom 1: </string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="pb_glom_box">
+        <item>
+         <property name="text">
+          <string/>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>None</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>PBG5</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>PBG6</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>PBG7</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="plot_ring_check_box">
+      <property name="text">
+       <string>Plot Ring Neurons</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="plot_hist_button">
+      <property name="text">
+       <string>Plot</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="plotarea" native="true"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
