@@ -1,8 +1,17 @@
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QMainWindow, QApplication
 import sys
+import numpy as np
+import matplotlib.pyplot as plt
+
 import plot_hist_gui
 import plot_distance_hist
+
+from matplotlib.backends.qt_compat import QtCore, QtWidgets, is_pyqt5
+from matplotlib.backends.backend_qt5agg import (
+        FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
+from matplotlib.figure import Figure
+
 
 class PlotHistApp(QMainWindow):
     def __init__(self):
@@ -14,6 +23,14 @@ class PlotHistApp(QMainWindow):
         self.ui.outgoing_connections_checkbox.stateChanged.connect(self.ClickBox)
         self.ui.plot_hist_button.clicked.connect(self.PlotHist)
         self.ui.plot_ring_check_box.stateChanged.connect(self.PlotRing)
+        self.PlotCanvas()
+
+    def PlotCanvas(self):
+        self.figure = plt.figure()
+        self.canvas = FigureCanvas(self.figure)
+        self.toolbar = NavigationToolbar(self.canvas, self)
+        self.ui.verticalLayout_3.addWidget(self.canvas)
+        self.ui.verticalLayout_3.addWidget(self.toolbar)
 
     def FetchSkidData(self):
         self.skeleton_id_text = self.ui.enter_skid_textbox.text()
@@ -30,8 +47,10 @@ class PlotHistApp(QMainWindow):
             return 'pre'
 
     def PlotHist(self):
+        plt.cla()
         neuron_type1_text = str(self.ui.neuron_type1_box.currentText())
         self.neuron_conn_class.plot_hist(neuron_type=neuron_type1_text, PB_glom=self.PBGlom(), ring=self.PlotRing())
+        self.canvas.draw()
 
     def PBGlom(self):
         pb_glom_box_text = str(self.ui.pb_glom_box.currentText())
