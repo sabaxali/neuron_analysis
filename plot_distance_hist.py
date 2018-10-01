@@ -160,7 +160,7 @@ class NeuronConnectivity:  # pass in an array of skeleton ids or single id (int)
         plt.title(self.source_id_name)
         plt.ylabel('Number of synapses')
         plt.xlabel('Distance from root (nm)')
-        plt.show()
+        # plt.show()
 
     def plot_type(self, neuron_type):
         distance_list = []
