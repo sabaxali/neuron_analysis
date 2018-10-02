@@ -3,10 +3,8 @@ from PyQt5.QtWidgets import QMainWindow, QApplication
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-
-import plot_hist_gui
+import plot_hist_ui
 import plot_distance_hist
-
 from matplotlib.backends.qt_compat import QtCore, QtWidgets, is_pyqt5
 from matplotlib.backends.backend_qt5agg import (
         FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
@@ -16,7 +14,7 @@ from matplotlib.figure import Figure
 class PlotHistApp(QMainWindow):
     def __init__(self):
         super(PlotHistApp, self).__init__()
-        self.ui = plot_hist_gui.Ui_MainWindow()
+        self.ui = plot_hist_ui.Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.fetch_skiddata_button.clicked.connect(self.FetchSkidData)# connect button clicked with action
         self.ui.incoming_connections_checkbox.stateChanged.connect(self.ClickBox)
@@ -26,7 +24,7 @@ class PlotHistApp(QMainWindow):
         self.PlotCanvas()
 
     def PlotCanvas(self):
-        self.figure = plt.figure()
+        self.figure = plt.figure(figsize=(5,8))
         self.canvas = FigureCanvas(self.figure)
         self.toolbar = NavigationToolbar(self.canvas, self)
         self.ui.verticalLayout_3.addWidget(self.canvas)
@@ -39,7 +37,6 @@ class PlotHistApp(QMainWindow):
         self.neuron_conn_class.filter_skid_data(self.ClickBox(), int(self.filter_nodes_text))
         self.neuron_conn_class.get_df()
 
-
     def ClickBox(self):
         if self.ui.incoming_connections_checkbox.isChecked():
             return 'post'
@@ -47,17 +44,27 @@ class PlotHistApp(QMainWindow):
             return 'pre'
 
     def PlotHist(self):
-        plt.cla()
+        self.figure.clear()
         neuron_type1_text = str(self.ui.neuron_type1_box.currentText())
-        self.neuron_conn_class.plot_hist(neuron_type=neuron_type1_text, PB_glom=self.PBGlom(), ring=self.PlotRing())
-        self.canvas.draw()
+        neuron_type2_text = str(self.ui.neuron_type2_box.currentText())
+        self.neuron_conn_class.plot_hist(neuron_type=neuron_type1_text, neuron_type2=neuron_type2_text,
+                                         PB_glom=self.PBGlom1(), PB_glom2=self.PBGlom2(), ring=self.PlotRing())
+        self.canvas.draw_idle()
 
-    def PBGlom(self):
-        pb_glom_box_text = str(self.ui.pb_glom_box.currentText())
-        if pb_glom_box_text == 'None':
+    def PBGlom1(self):
+        pb_glom1_box_text = str(self.ui.pb_glom1_box.currentText())
+        if pb_glom1_box_text == 'None':
             return None
         else:
-            return pb_glom_box_text
+            return pb_glom1_box_text
+
+    def PBGlom2(self):
+        pb_glom2_box_text = str(self.ui.pb_glom2_box.currentText())
+        if pb_glom2_box_text == 'None':
+            return None
+        else:
+            return pb_glom2_box_text
+
 
     def PlotRing(self):
         if self.ui.plot_ring_check_box.isChecked():
