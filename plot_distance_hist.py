@@ -1,6 +1,7 @@
 import requests
 from requests.auth import HTTPBasicAuth
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import pymaid
 import json
@@ -30,10 +31,14 @@ class CatmaidApiTokenAuth(HTTPBasicAuth):
         return r
 
 
-class NeuronConnectivity:  # pass in an array of skeleton ids or single id (int)
-    def __init__(self, list_of_skids):
-        self.list_of_skids = list_of_skids
-        self.source_neuron = pymaid.get_neuron(list_of_skids)
+class NeuronConnectivity:
+
+    """pass in single id (int), can not pass in list because pymaid only allows
+    distance matrix for once skeleton at a time"""
+
+    def __init__(self, skeleton_id):
+        self.skeleton_id = skeleton_id
+        self.source_neuron = pymaid.get_neuron(skeleton_id)
         self.despiked_neuron = pymaid.despike_neuron(self.source_neuron, sigma=5, inplace=False)
         self.neuron_type_dict = {
             'PBG5': {'P-EN1': {'neuron_id': [649823, 668576], 'glom_color': 'salmon', 'default_color': 'red'},
@@ -51,16 +56,16 @@ class NeuronConnectivity:  # pass in an array of skeleton ids or single id (int)
             'PBG7': {'P-EN1': {'neuron_id': [827466, 828911], 'glom_color': 'violet', 'default_color': 'red'},
                      'P-EN2': {'neuron_id': [1625086, 1639675], 'glom_color': 'violet', 'default_color': 'pink'}},
             'No_PB': {'G-E': {'neuron_id': [432766], 'default_color': 'gold'},
-                      'BiDi': {'neuron_id': [6346245, 6353358, 6417166, 6813859, 7014054,
+                      'Bidirectional Ring': {'neuron_id': [6346245, 6353358, 6417166, 6813859, 7014054,
                                              7014310, 7029666, 6393609], 'default_color': 'orange'}}}
 
     def filter_skid_data(self, pre_or_post, min_num_nodes=1):
 
         """Select if upstream(post) or downstream(pre) synaptic partners are wanted
-         which can also be filtered by number of nodes on partner skeleton"""
+         and can also filter by number of nodes on partner skeleton"""
 
         self.filtered_partner_nodes_list = []
-        for item in self.list_of_skids:
+        for item in self.skeleton_id:
             req = requests.post('https://neuropil.janelia.org/tracing/fafb/v14/1/skeletons/connectivity',
                               data={'source_skeleton_ids[]': [item], 'boolean_op': 'OR', 'with_nodes': 'true'},
                               auth=CatmaidApiTokenAuth(token, username, password))
@@ -112,13 +117,17 @@ class NeuronConnectivity:  # pass in an array of skeleton ids or single id (int)
         self.connectivity_df = pd.DataFrame(value_list,
                                             columns=['partner_id', self.columntitle, 'synapse_count', 'source_neuron',
                                                      'source_id', 'T1_nodes', 'distance', 'node_distance'])
-        print(self.connectivity_df)
+        #print(self.connectivity_df)
+        total_synapsecount = (np.sum(self.connectivity_df['synapse_count'].values))
+        self.n_bins = int(np.sqrt(total_synapsecount))
         pd.set_option('display.max_rows', 500)
         pd.set_option('display.max_columns', 500)
         pd.set_option('display.width', 1000)
 
 
-    def plot_hist(self, neuron_type=None, neuron_type2=None, PB_glom=None, PB_glom2=None, ring=None):
+    def plot_hist(self, neuron_type=None, neuron_type2=None, PB_glom=None, PB_glom2=None, ring=False):
+        """Purpose of identified neuron list is to be able to create ring list based on skeleton ids
+        that are not in identified neuron list"""
         identified_neuron_list = []
         for column_key in self.neuron_type_dict:
             for neuron_key in self.neuron_type_dict[column_key]:
@@ -131,7 +140,7 @@ class NeuronConnectivity:  # pass in an array of skeleton ids or single id (int)
                 ring_neuron_list.append(values)
 
         if ring == True:
-            plt.hist(ring_neuron_list, range=(15000, 90000), bins=30, alpha=0.5, color='green', label='"Ring"')
+            plt.hist(ring_neuron_list, range=(15000, 90000), bins=self.n_bins, alpha=0.5, color='green', label='"Ring"')
 
 
         if PB_glom == None:
@@ -139,21 +148,21 @@ class NeuronConnectivity:  # pass in an array of skeleton ids or single id (int)
             neuron2_distance_list = self.plot_type(neuron_type2)
             hist_color = self.get_type_color(neuron_type)
             hist_color2 = self.get_type_color(neuron_type2)
-            plt.hist(neuron_distance_list, range=(15000, 90000), bins=30, alpha=0.5, color=hist_color,
+            plt.hist(neuron_distance_list, range=(15000, 90000), bins=self.n_bins, alpha=0.5, color=hist_color,
                      label=neuron_type)
-            plt.hist(neuron2_distance_list, range=(15000, 90000), bins=30, alpha=0.5, color=hist_color2,
+            plt.hist(neuron2_distance_list, range=(15000, 90000), bins=self.n_bins, alpha=0.5, color=hist_color2,
                      label=neuron_type2)
 
         if PB_glom != None:
             glom_distance_list = self.plot_glom(PB_glom, neuron_type)
             glom_color = self.get_glom_color(PB_glom)
-            plt.hist(glom_distance_list, range=(15000, 90000), bins=30, alpha=0.5, color=glom_color,
+            plt.hist(glom_distance_list, range=(15000, 90000), bins=self.n_bins, alpha=0.5, color=glom_color,
                      label=PB_glom + neuron_type)
 
         if PB_glom2 != None:
             glom2_distance_list = self.plot_glom(PB_glom2, neuron_type)
             glom2_color = self.get_glom_color(PB_glom2)
-            plt.hist(glom2_distance_list, range=(15000, 90000), bins=30, alpha=0.5, color=glom2_color,
+            plt.hist(glom2_distance_list, range=(15000, 90000), bins=self.n_bins, alpha=0.5, color=glom2_color,
                      label=PB_glom2 + neuron_type)
 
         plt.legend()
@@ -195,3 +204,4 @@ class NeuronConnectivity:  # pass in an array of skeleton ids or single id (int)
             if PB_glom == column_key:
                 for neuron_key in self.neuron_type_dict[column_key]:
                     return self.neuron_type_dict[column_key][neuron_key]['glom_color']
+
